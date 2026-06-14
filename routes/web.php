@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\GroupMemberController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -22,7 +24,12 @@ Route::middleware('guest')->group(function () {
 
 // Authenticated app.
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', fn () => inertia('dashboard'))->name('dashboard');
+    Route::get('/dashboard', [GroupController::class, 'index'])->name('dashboard');
+
+    // Groups & members.
+    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
+    Route::post('/groups/{group}/members', [GroupMemberController::class, 'store'])->name('groups.members.store');
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
