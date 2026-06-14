@@ -4,6 +4,8 @@ import { bunny } from "laravel-vite-plugin/fonts";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import inertia from "@inertiajs/vite";
+import { wayfinder } from "@laravel/vite-plugin-wayfinder";
+import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
     plugins: [
@@ -16,14 +18,23 @@ export default defineConfig({
                 }),
             ],
         }),
-        react(),
-        inertia(),
         tailwindcss(),
+        inertia({ ssr: false }),
+        react(),
+        wayfinder(),
     ],
+    resolve: {
+        alias: {
+            "@": fileURLToPath(new URL("./resources/js", import.meta.url)),
+        },
+    },
     server: {
         host: "0.0.0.0",
         port: 49105,
         strictPort: true,
+        watch: {
+            ignored: ["**/storage/framework/views/**"],
+        },
         hmr: {
             host: "localhost",
             clientPort: 49105,
