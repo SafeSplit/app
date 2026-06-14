@@ -1,4 +1,29 @@
+name: safesplit-app
+
 services:
+    safesplit-app:
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+            args:
+                uid: 1000
+                user: safesplit
+        image: safesplit-app
+        container_name: safesplit-app
+        restart: unless-stopped
+        command: ["sh", "./docker/start.sh"]
+        environment:
+            DB_HOST: safesplit-mariadb
+            DB_PORT: 3306
+        ports:
+            - 49100:8000     # php artisan serve
+            - 49105:49105    # Vite dev server
+        volumes:
+            - .:/var/www/html
+        depends_on:
+            safesplit-mariadb:
+                condition: service_healthy
+
     safesplit-mariadb:
         image: mariadb:11
         container_name: safesplit-mariadb
@@ -9,7 +34,7 @@ services:
             MARIADB_USER: safesplit
             MARIADB_PASSWORD: safesplit
         ports:
-            - 33106:3306
+            - 49110:3306
         volumes:
             - ./.configs/mariadb-data:/var/lib/mysql
         healthcheck:
@@ -28,6 +53,6 @@ services:
             PMA_PASSWORD: root
             UPLOAD_LIMIT: 512M
         ports:
-            - 38080:80
+            - 49120:80
         depends_on:
             - safesplit-mariadb
