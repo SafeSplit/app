@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ExpenseSplitController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupMemberController;
+use App\Http\Controllers\SettlementController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +33,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
     Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
     Route::post('/groups/{group}/members', [GroupMemberController::class, 'store'])->name('groups.members.store');
+
+    // Expenses & splits.
+    Route::post('/groups/{group}/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::get('/expenses/{expense}', [ExpenseController::class, 'show'])->name('expenses.show');
+    Route::post('/expenses/{expense}/accept', [ExpenseSplitController::class, 'accept'])->name('expenses.accept');
+    Route::post('/expenses/{expense}/reject', [ExpenseSplitController::class, 'reject'])->name('expenses.reject');
+
+    // Settlements (reimbursements).
+    Route::post('/groups/{group}/settlements', [SettlementController::class, 'store'])->name('settlements.store');
+    Route::post('/settlements/{settlement}/accept', [SettlementController::class, 'accept'])->name('settlements.accept');
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 

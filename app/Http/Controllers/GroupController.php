@@ -53,9 +53,18 @@ class GroupController extends Controller
     /** Group detail: members + metadata. Only members may view. */
     public function show(Request $request, Group $group): Response
     {
-        abort_unless($this->isMember($group, $request->user()->id), 403);
+        $me = $request->user()->id;
 
-        $group->load(['creator:id,name,email', 'users:id,name,email,wallet_address']);
+        abort_unless($this->isMember($group, $me), 403);
+
+        $group->load([
+            'creator:id,name,email',
+            'users:id,name,email,wallet_address',
+            'expenses' => fn ($q) => $q->latest()->with(['payer:id,name', 'splits']),
+            'settlements' => fn ($q) => $q->latest()->with(['fromUser:id,name', 'toUser:id,name']),
+        ]);
+
+        $balances = $group->balances();
 
         return Inertia::render('groups/show', [
             'group' => [
@@ -63,15 +72,40 @@ class GroupController extends Controller
                 'name' => $group->name,
                 'description' => $group->description,
                 'creator' => $group->creator?->only(['id', 'name', 'email']),
-                'is_owner' => $group->created_by === $request->user()->id,
+                'is_owner' => $group->created_by === $me,
                 'members' => $group->users->map(fn ($u) => [
                     'id' => $u->id,
                     'name' => $u->name,
                     'email' => $u->email,
                     'wallet_address' => $u->wallet_address,
                     'role' => $u->pivot->role,
+                    'balance' => $balances[$u->id] ?? 0,
                 ]),
             ],
+            'expenses' => $group->expenses->map(function ($e) use ($me) {
+                $mySplit = $e->splits->firstWhere('user_id', $me);
+
+                return [
+                    'id' => $e->id,
+                    'description' => $e->description,
+                    'amount' => $e->amount,
+                    'currency' => $e->currency,
+                    'status' => $e->status,
+                    'payer' => $e->payer->only(['id', 'name']),
+                    'participants_count' => $e->splits->count(),
+                    'my_status' => $mySplit?->status,
+                    'created_at' => $e->created_at->toDateString(),
+                ];
+            }),
+            'settlements' => $group->settlements->map(fn ($s) => [
+                'id' => $s->id,
+                'from' => $s->fromUser->only(['id', 'name']),
+                'to' => $s->toUser->only(['id', 'name']),
+                'amount' => $s->amount,
+                'currency' => $s->currency,
+                'status' => $s->status,
+                'can_accept' => $s->to_user_id === $me && $s->status === 'declared',
+            ]),
         ]);
     }
 
