@@ -9,7 +9,7 @@ function euro(v) {
 }
 
 export default function ExpenseShow() {
-    const { expense, my_split } = usePage().props;
+    const { expense, my_split, events = [] } = usePage().props;
 
     const canRespond = my_split && !my_split.is_payer && expense.status === "active";
 
@@ -69,6 +69,8 @@ export default function ExpenseShow() {
                             ))}
                         </div>
                     </div>
+
+                    <EventsCard events={events} />
                 </div>
 
                 {/* Action panel */}
@@ -107,6 +109,52 @@ export default function ExpenseShow() {
             </div>
         </AppLayout>
     );
+}
+
+function EventsCard({ events }) {
+    if (!events.length) return null;
+    return (
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl animate-rise [animation-delay:200ms]">
+            <div className="flex items-center gap-2">
+                <h2 className="text-lg font-semibold">Journal</h2>
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-slate-400">
+                    immutable
+                </span>
+            </div>
+            <p className="mt-1 text-sm text-slate-400">
+                Every action is recorded as an event with a SHA-256 fingerprint.
+            </p>
+            <div className="mt-4 space-y-3">
+                {events.map((ev, i) => (
+                    <div key={i} className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <div className="flex items-center justify-between">
+                            <span className="font-mono text-xs font-semibold text-brand-400">
+                                {ev.event_type}
+                            </span>
+                            <AnchorBadge status={ev.anchor_status} />
+                        </div>
+                        <p className="mt-1.5 break-all font-mono text-xs text-slate-500">
+                            {ev.event_hash}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-600">
+                            {ev.user?.name ? `${ev.user.name} · ` : ""}
+                            {ev.created_at}
+                        </p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function AnchorBadge({ status }) {
+    const map = {
+        confirmed: ["bg-emerald-500/15 text-emerald-300", "confirmed"],
+        failed: ["bg-rose-500/15 text-rose-300", "failed"],
+        pending: ["bg-amber-500/15 text-amber-300", "pending"],
+    };
+    const [cls, label] = map[status] ?? map.pending;
+    return <span className={`rounded-full px-2 py-0.5 text-xs ${cls}`}>{label}</span>;
 }
 
 function ExpenseStatus({ status }) {

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\SettlementController::store
-* @see app/Http/Controllers/SettlementController.php:14
+* @see app/Http/Controllers/SettlementController.php:17
 * @route '/groups/{group}/settlements'
 */
 export const store = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\SettlementController::store
-* @see app/Http/Controllers/SettlementController.php:14
+* @see app/Http/Controllers/SettlementController.php:17
 * @route '/groups/{group}/settlements'
 */
 store.url = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ store.url = (args: { group: number | { id: number } } | [group: number | { id: n
 
 /**
 * @see \App\Http\Controllers\SettlementController::store
-* @see app/Http/Controllers/SettlementController.php:14
+* @see app/Http/Controllers/SettlementController.php:17
 * @route '/groups/{group}/settlements'
 */
 store.post = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ store.post = (args: { group: number | { id: number } } | [group: number | { id: 
 
 /**
 * @see \App\Http\Controllers\SettlementController::accept
-* @see app/Http/Controllers/SettlementController.php:43
+* @see app/Http/Controllers/SettlementController.php:61
 * @route '/settlements/{settlement}/accept'
 */
 export const accept = (args: { settlement: number | { id: number } } | [settlement: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -74,7 +74,7 @@ accept.definition = {
 
 /**
 * @see \App\Http\Controllers\SettlementController::accept
-* @see app/Http/Controllers/SettlementController.php:43
+* @see app/Http/Controllers/SettlementController.php:61
 * @route '/settlements/{settlement}/accept'
 */
 accept.url = (args: { settlement: number | { id: number } } | [settlement: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -107,7 +107,7 @@ accept.url = (args: { settlement: number | { id: number } } | [settlement: numbe
 
 /**
 * @see \App\Http\Controllers\SettlementController::accept
-* @see app/Http/Controllers/SettlementController.php:43
+* @see app/Http/Controllers/SettlementController.php:61
 * @route '/settlements/{settlement}/accept'
 */
 accept.post = (args: { settlement: number | { id: number } } | [settlement: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

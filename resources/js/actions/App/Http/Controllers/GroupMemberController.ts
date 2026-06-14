@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\GroupMemberController::store
-* @see app/Http/Controllers/GroupMemberController.php:14
+* @see app/Http/Controllers/GroupMemberController.php:16
 * @route '/groups/{group}/members'
 */
 export const store = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\GroupMemberController::store
-* @see app/Http/Controllers/GroupMemberController.php:14
+* @see app/Http/Controllers/GroupMemberController.php:16
 * @route '/groups/{group}/members'
 */
 store.url = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ store.url = (args: { group: number | { id: number } } | [group: number | { id: n
 
 /**
 * @see \App\Http\Controllers\GroupMemberController::store
-* @see app/Http/Controllers/GroupMemberController.php:14
+* @see app/Http/Controllers/GroupMemberController.php:16
 * @route '/groups/{group}/members'
 */
 store.post = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({

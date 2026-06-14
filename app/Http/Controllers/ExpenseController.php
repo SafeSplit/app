@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Expense;
 use App\Models\Group;
+use App\Models\LedgerEvent;
+use App\Services\LedgerService;
+use App\Support\Canonical;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -14,7 +18,7 @@ use Inertia\Response;
 class ExpenseController extends Controller
 {
     /** Declare an expense and its per-participant splits. */
-    public function store(Request $request, Group $group): RedirectResponse
+    public function store(Request $request, Group $group, LedgerService $ledger): RedirectResponse
     {
         abort_unless($group->users()->whereKey($request->user()->id)->exists(), 403);
 
@@ -45,22 +49,51 @@ class ExpenseController extends Controller
             ]);
         }
 
-        $expense = $group->expenses()->create([
-            'payer_id' => $validated['payer_id'],
-            'description' => $validated['description'],
-            'amount' => $validated['amount'],
-            'currency' => 'EUR',
-            'status' => 'active',
-        ]);
-
-        foreach ($validated['participants'] as $p) {
-            $expense->splits()->create([
-                'user_id' => $p['user_id'],
-                'amount_owed' => $p['amount_owed'],
-                // The payer implicitly accepts their own share.
-                'status' => $p['user_id'] === $validated['payer_id'] ? 'accepted' : 'pending',
+        // Business write + the one immutable event are a single atomic operation.
+        $expense = DB::transaction(function () use ($group, $validated, $ledger) {
+            $expense = $group->expenses()->create([
+                'payer_id' => $validated['payer_id'],
+                'description' => $validated['description'],
+                'amount' => $validated['amount'],
+                'currency' => 'EUR',
+                'status' => 'active',
             ]);
-        }
+
+            foreach ($validated['participants'] as $p) {
+                $expense->splits()->create([
+                    'user_id' => $p['user_id'],
+                    'amount_owed' => $p['amount_owed'],
+                    // The payer implicitly accepts their own share.
+                    'status' => $p['user_id'] === $validated['payer_id'] ? 'accepted' : 'pending',
+                ]);
+            }
+
+            // Deterministically ordered participants for a reproducible hash.
+            $participants = collect($validated['participants'])
+                ->sortBy('user_id')
+                ->values()
+                ->map(fn ($p) => [
+                    'user_id' => $p['user_id'],
+                    'amount_owed' => Canonical::amount($p['amount_owed']),
+                ])
+                ->all();
+
+            $ledger->record('EXPENSE_CREATED', [
+                'expense_id' => $expense->id,
+                'group_id' => $group->id,
+                'payer_id' => $expense->payer_id,
+                'amount' => Canonical::amount($expense->amount),
+                'currency' => $expense->currency,
+                'participants' => $participants,
+            ], [
+                'aggregate_type' => 'expense',
+                'aggregate_id' => $expense->id,
+                'group_id' => $group->id,
+                'user_id' => $expense->payer_id,
+            ]);
+
+            return $expense;
+        });
 
         return redirect()->route('groups.show', $group);
     }
@@ -74,7 +107,21 @@ class ExpenseController extends Controller
 
         $mySplit = $expense->splits->firstWhere('user_id', $request->user()->id);
 
+        $events = LedgerEvent::where('aggregate_type', 'expense')
+            ->where('aggregate_id', $expense->id)
+            ->with('user:id,name')
+            ->orderBy('created_at')
+            ->get()
+            ->map(fn (LedgerEvent $ev) => [
+                'event_type' => $ev->event_type,
+                'event_hash' => $ev->event_hash,
+                'anchor_status' => $ev->anchor_status,
+                'user' => $ev->user?->only(['id', 'name']),
+                'created_at' => $ev->created_at->toDateTimeString(),
+            ]);
+
         return Inertia::render('expenses/show', [
+            'events' => $events,
             'expense' => [
                 'id' => $expense->id,
                 'group_id' => $expense->group_id,

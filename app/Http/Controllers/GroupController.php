@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Services\LedgerService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,23 +31,38 @@ class GroupController extends Controller
     }
 
     /** Create a group; the creator becomes its owner-member. */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, LedgerService $ledger): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $group = Group::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'created_by' => $request->user()->id,
-        ]);
+        $group = DB::transaction(function () use ($request, $validated, $ledger) {
+            $group = Group::create([
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+                'created_by' => $request->user()->id,
+            ]);
 
-        $group->members()->create([
-            'user_id' => $request->user()->id,
-            'role' => 'owner',
-        ]);
+            $group->members()->create([
+                'user_id' => $request->user()->id,
+                'role' => 'owner',
+            ]);
+
+            $ledger->record('GROUP_CREATED', [
+                'group_id' => $group->id,
+                'name' => $group->name,
+                'created_by' => $group->created_by,
+            ], [
+                'aggregate_type' => 'group',
+                'aggregate_id' => $group->id,
+                'group_id' => $group->id,
+                'user_id' => $group->created_by,
+            ]);
+
+            return $group;
+        });
 
         return redirect()->route('groups.show', $group);
     }

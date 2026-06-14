@@ -2,7 +2,7 @@ import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefa
 import members from './members'
 /**
 * @see \App\Http\Controllers\GroupController::store
-* @see app/Http/Controllers/GroupController.php:32
+* @see app/Http/Controllers/GroupController.php:34
 * @route '/groups'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -17,7 +17,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\GroupController::store
-* @see app/Http/Controllers/GroupController.php:32
+* @see app/Http/Controllers/GroupController.php:34
 * @route '/groups'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -26,7 +26,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\GroupController::store
-* @see app/Http/Controllers/GroupController.php:32
+* @see app/Http/Controllers/GroupController.php:34
 * @route '/groups'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -36,7 +36,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\GroupController::show
-* @see app/Http/Controllers/GroupController.php:54
+* @see app/Http/Controllers/GroupController.php:71
 * @route '/groups/{group}'
 */
 export const show = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -51,7 +51,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\GroupController::show
-* @see app/Http/Controllers/GroupController.php:54
+* @see app/Http/Controllers/GroupController.php:71
 * @route '/groups/{group}'
 */
 show.url = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -84,7 +84,7 @@ show.url = (args: { group: number | { id: number } } | [group: number | { id: nu
 
 /**
 * @see \App\Http\Controllers\GroupController::show
-* @see app/Http/Controllers/GroupController.php:54
+* @see app/Http/Controllers/GroupController.php:71
 * @route '/groups/{group}'
 */
 show.get = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -94,7 +94,7 @@ show.get = (args: { group: number | { id: number } } | [group: number | { id: nu
 
 /**
 * @see \App\Http\Controllers\GroupController::show
-* @see app/Http/Controllers/GroupController.php:54
+* @see app/Http/Controllers/GroupController.php:71
 * @route '/groups/{group}'
 */
 show.head = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

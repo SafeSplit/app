@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\ExpenseController::store
-* @see app/Http/Controllers/ExpenseController.php:17
+* @see app/Http/Controllers/ExpenseController.php:21
 * @route '/groups/{group}/expenses'
 */
 export const store = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\ExpenseController::store
-* @see app/Http/Controllers/ExpenseController.php:17
+* @see app/Http/Controllers/ExpenseController.php:21
 * @route '/groups/{group}/expenses'
 */
 store.url = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ store.url = (args: { group: number | { id: number } } | [group: number | { id: n
 
 /**
 * @see \App\Http\Controllers\ExpenseController::store
-* @see app/Http/Controllers/ExpenseController.php:17
+* @see app/Http/Controllers/ExpenseController.php:21
 * @route '/groups/{group}/expenses'
 */
 store.post = (args: { group: number | { id: number } } | [group: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ store.post = (args: { group: number | { id: number } } | [group: number | { id: 
 
 /**
 * @see \App\Http\Controllers\ExpenseController::show
-* @see app/Http/Controllers/ExpenseController.php:69
+* @see app/Http/Controllers/ExpenseController.php:102
 * @route '/expenses/{expense}'
 */
 export const show = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -74,7 +74,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\ExpenseController::show
-* @see app/Http/Controllers/ExpenseController.php:69
+* @see app/Http/Controllers/ExpenseController.php:102
 * @route '/expenses/{expense}'
 */
 show.url = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -107,7 +107,7 @@ show.url = (args: { expense: number | { id: number } } | [expense: number | { id
 
 /**
 * @see \App\Http\Controllers\ExpenseController::show
-* @see app/Http/Controllers/ExpenseController.php:69
+* @see app/Http/Controllers/ExpenseController.php:102
 * @route '/expenses/{expense}'
 */
 show.get = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -117,7 +117,7 @@ show.get = (args: { expense: number | { id: number } } | [expense: number | { id
 
 /**
 * @see \App\Http\Controllers\ExpenseController::show
-* @see app/Http/Controllers/ExpenseController.php:69
+* @see app/Http/Controllers/ExpenseController.php:102
 * @route '/expenses/{expense}'
 */
 show.head = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({

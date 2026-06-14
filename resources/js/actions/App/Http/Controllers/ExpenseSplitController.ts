@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\ExpenseSplitController::accept
-* @see app/Http/Controllers/ExpenseSplitController.php:12
+* @see app/Http/Controllers/ExpenseSplitController.php:14
 * @route '/expenses/{expense}/accept'
 */
 export const accept = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ accept.definition = {
 
 /**
 * @see \App\Http\Controllers\ExpenseSplitController::accept
-* @see app/Http/Controllers/ExpenseSplitController.php:12
+* @see app/Http/Controllers/ExpenseSplitController.php:14
 * @route '/expenses/{expense}/accept'
 */
 accept.url = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ accept.url = (args: { expense: number | { id: number } } | [expense: number | { 
 
 /**
 * @see \App\Http\Controllers\ExpenseSplitController::accept
-* @see app/Http/Controllers/ExpenseSplitController.php:12
+* @see app/Http/Controllers/ExpenseSplitController.php:14
 * @route '/expenses/{expense}/accept'
 */
 accept.post = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -59,7 +59,7 @@ accept.post = (args: { expense: number | { id: number } } | [expense: number | {
 
 /**
 * @see \App\Http\Controllers\ExpenseSplitController::reject
-* @see app/Http/Controllers/ExpenseSplitController.php:18
+* @see app/Http/Controllers/ExpenseSplitController.php:20
 * @route '/expenses/{expense}/reject'
 */
 export const reject = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -74,7 +74,7 @@ reject.definition = {
 
 /**
 * @see \App\Http\Controllers\ExpenseSplitController::reject
-* @see app/Http/Controllers/ExpenseSplitController.php:18
+* @see app/Http/Controllers/ExpenseSplitController.php:20
 * @route '/expenses/{expense}/reject'
 */
 reject.url = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -107,7 +107,7 @@ reject.url = (args: { expense: number | { id: number } } | [expense: number | { 
 
 /**
 * @see \App\Http\Controllers\ExpenseSplitController::reject
-* @see app/Http/Controllers/ExpenseSplitController.php:18
+* @see app/Http/Controllers/ExpenseSplitController.php:20
 * @route '/expenses/{expense}/reject'
 */
 reject.post = (args: { expense: number | { id: number } } | [expense: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
