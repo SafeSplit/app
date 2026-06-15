@@ -15,11 +15,17 @@ services:
         environment:
             DB_HOST: safesplit-mariadb
             DB_PORT: 3306
+            # Hardhat JSON-RPC reachable from inside the container (host-exposed port).
+            SAFESPLIT_RPC_URL: http://host.docker.internal:49545
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         ports:
             - 49100:8000     # php artisan serve
             - 49105:49105    # Vite dev server
         volumes:
             - .:/var/www/html
+            # Shared contract deployment file written by the blockchain brick (D7).
+            - ../blockchain/deployments:/var/www/html/storage/app/blockchain
         depends_on:
             safesplit-mariadb:
                 condition: service_healthy

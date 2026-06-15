@@ -193,6 +193,11 @@ function SignableEvent({ ev }) {
                     <span className="text-xs text-slate-600">unsigned</span>
                 )}
             </div>
+            {ev.anchor_status === "confirmed" && ev.anchor_tx_hash && (
+                <p className="mt-1 break-all font-mono text-xs text-emerald-400/80">
+                    ⛓ anchored · tx {ev.anchor_tx_hash.slice(0, 14)}…
+                </p>
+            )}
             {error && <p className="mt-1 text-xs text-rose-400">{error}</p>}
         </div>
     );
