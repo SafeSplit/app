@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, router, usePage } from "@inertiajs/react";
 import AppLayout from "../../components/AppLayout";
 import { accept as acceptSplit, reject as rejectSplit } from "@/actions/App/Http/Controllers/ExpenseSplitController";
 import { show as showGroup } from "@/actions/App/Http/Controllers/GroupController";
+import { store as signEvent } from "@/actions/App/Http/Controllers/EventSignatureController";
+import { signMessage, shortAddress } from "../../lib/metamask";
 
 function euro(v) {
     return `€${Number(v).toFixed(2)}`;
@@ -122,27 +124,76 @@ function EventsCard({ events }) {
                 </span>
             </div>
             <p className="mt-1 text-sm text-slate-400">
-                Every action is recorded as an event with a SHA-256 fingerprint.
+                Every action is recorded as an event with a SHA-256 fingerprint, signed by its author.
             </p>
             <div className="mt-4 space-y-3">
-                {events.map((ev, i) => (
-                    <div key={i} className="rounded-xl border border-white/10 bg-black/20 p-3">
-                        <div className="flex items-center justify-between">
-                            <span className="font-mono text-xs font-semibold text-brand-400">
-                                {ev.event_type}
-                            </span>
-                            <AnchorBadge status={ev.anchor_status} />
-                        </div>
-                        <p className="mt-1.5 break-all font-mono text-xs text-slate-500">
-                            {ev.event_hash}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-600">
-                            {ev.user?.name ? `${ev.user.name} · ` : ""}
-                            {ev.created_at}
-                        </p>
-                    </div>
+                {events.map((ev) => (
+                    <SignableEvent key={ev.id} ev={ev} />
                 ))}
             </div>
+        </div>
+    );
+}
+
+function SignableEvent({ ev }) {
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState(null);
+
+    async function sign() {
+        setError(null);
+        setBusy(true);
+        try {
+            // Sign the digest: "0x" + event_hash → MetaMask signs the raw 32 bytes.
+            const { signature } = await signMessage("0x" + ev.event_hash);
+            router.post(
+                signEvent.url(ev.id),
+                { signature },
+                {
+                    preserveScroll: true,
+                    onError: (errs) => setError(errs.signature ?? "Signing failed."),
+                    onFinish: () => setBusy(false),
+                },
+            );
+        } catch (e) {
+            const map = {
+                METAMASK_MISSING: "MetaMask isn't installed.",
+                USER_REJECTED: "Signature was rejected.",
+                NO_ACCOUNTS: "No MetaMask account available.",
+            };
+            setError(map[e.message] ?? "Could not sign.");
+            setBusy(false);
+        }
+    }
+
+    return (
+        <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+            <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-semibold text-brand-400">{ev.event_type}</span>
+                <AnchorBadge status={ev.anchor_status} />
+            </div>
+            <p className="mt-1.5 break-all font-mono text-xs text-slate-500">{ev.event_hash}</p>
+            <div className="mt-2 flex items-center justify-between gap-2">
+                <p className="text-xs text-slate-600">
+                    {ev.user?.name ? `${ev.user.name} · ` : ""}
+                    {ev.created_at}
+                </p>
+                {ev.signed ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-0.5 font-mono text-xs text-emerald-300">
+                        ✓ signed {ev.signer_address ? shortAddress(ev.signer_address) : ""}
+                    </span>
+                ) : ev.can_sign ? (
+                    <button
+                        onClick={sign}
+                        disabled={busy}
+                        className="shrink-0 rounded-lg bg-amber-400/90 px-3 py-1 text-xs font-semibold text-black transition hover:bg-amber-300 disabled:opacity-60"
+                    >
+                        {busy ? "Signing…" : "🦊 Sign"}
+                    </button>
+                ) : (
+                    <span className="text-xs text-slate-600">unsigned</span>
+                )}
+            </div>
+            {error && <p className="mt-1 text-xs text-rose-400">{error}</p>}
         </div>
     );
 }

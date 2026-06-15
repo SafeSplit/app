@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\EventSignatureController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseSplitController;
 use App\Http\Controllers\GroupController;
@@ -43,6 +44,9 @@ Route::middleware('auth')->group(function () {
     // Settlements (reimbursements).
     Route::post('/groups/{group}/settlements', [SettlementController::class, 'store'])->name('settlements.store');
     Route::post('/settlements/{settlement}/accept', [SettlementController::class, 'accept'])->name('settlements.accept');
+
+    // Two-phase event signing (browser returns only the signature — D6).
+    Route::post('/events/{event}/sign', [EventSignatureController::class, 'store'])->name('events.sign');
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 

@@ -113,9 +113,14 @@ class ExpenseController extends Controller
             ->orderBy('created_at')
             ->get()
             ->map(fn (LedgerEvent $ev) => [
+                'id' => $ev->id,
                 'event_type' => $ev->event_type,
                 'event_hash' => $ev->event_hash,
                 'anchor_status' => $ev->anchor_status,
+                'anchor_tx_hash' => $ev->anchor_tx_hash,
+                'signed' => $ev->signature !== null,
+                'signer_address' => $ev->signer_address,
+                'can_sign' => $ev->user_id === $request->user()->id && $ev->signature === null,
                 'user' => $ev->user?->only(['id', 'name']),
                 'created_at' => $ev->created_at->toDateTimeString(),
             ]);

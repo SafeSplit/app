@@ -4,6 +4,7 @@ import GroupMemberController from './GroupMemberController'
 import ExpenseController from './ExpenseController'
 import ExpenseSplitController from './ExpenseSplitController'
 import SettlementController from './SettlementController'
+import EventSignatureController from './EventSignatureController'
 import WalletController from './WalletController'
 
 const Controllers = {
@@ -13,6 +14,7 @@ const Controllers = {
     ExpenseController: Object.assign(ExpenseController, ExpenseController),
     ExpenseSplitController: Object.assign(ExpenseSplitController, ExpenseSplitController),
     SettlementController: Object.assign(SettlementController, SettlementController),
+    EventSignatureController: Object.assign(EventSignatureController, EventSignatureController),
     WalletController: Object.assign(WalletController, WalletController),
 }
 

@@ -36,6 +36,22 @@ export async function ensureSafeSplitNetwork() {
     }
 }
 
+/** Read the currently-selected account without prompting (null if none / locked). */
+export async function getCurrentAccount() {
+    if (!hasMetaMask()) return null;
+    const accounts = await window.ethereum.request({ method: "eth_accounts" });
+    return accounts && accounts.length ? accounts[0].toLowerCase() : null;
+}
+
+/** Subscribe to account switches. Returns an unsubscribe function. */
+export function onAccountsChanged(callback) {
+    if (!hasMetaMask()) return () => {};
+    const handler = (accounts) =>
+        callback(accounts && accounts.length ? accounts[0].toLowerCase() : null);
+    window.ethereum.on("accountsChanged", handler);
+    return () => window.ethereum.removeListener("accountsChanged", handler);
+}
+
 /** Connect: request accounts, ensure network, return the (lowercased) address. */
 export async function connectWallet() {
     if (!hasMetaMask()) throw new Error("METAMASK_MISSING");
@@ -53,6 +69,29 @@ export async function connectWallet() {
     await ensureSafeSplitNetwork();
 
     return accounts[0].toLowerCase();
+}
+
+/**
+ * Sign a message with MetaMask via personal_sign (EIP-191).
+ * Returns { signature, address } — address is the account that signed (lowercased).
+ */
+export async function signMessage(message) {
+    if (!hasMetaMask()) throw new Error("METAMASK_MISSING");
+
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+    if (!accounts || accounts.length === 0) throw new Error("NO_ACCOUNTS");
+    const from = accounts[0];
+
+    try {
+        const signature = await window.ethereum.request({
+            method: "personal_sign",
+            params: [message, from],
+        });
+        return { signature, address: from.toLowerCase() };
+    } catch (err) {
+        if (err?.code === 4001) throw new Error("USER_REJECTED");
+        throw err;
+    }
 }
 
 /** Short display form: 0x1234…abcd */
