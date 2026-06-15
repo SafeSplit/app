@@ -6,6 +6,7 @@ use App\Models\Expense;
 use App\Models\Group;
 use App\Models\LedgerEvent;
 use App\Services\LedgerService;
+use App\Services\VerificationService;
 use App\Support\Canonical;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -99,7 +100,7 @@ class ExpenseController extends Controller
     }
 
     /** Expense detail: payer, splits, each participant's accept/dispute status. */
-    public function show(Request $request, Expense $expense): Response
+    public function show(Request $request, Expense $expense, VerificationService $verifier): Response
     {
         $expense->load(['group', 'payer:id,name,email', 'splits.user:id,name,email']);
 
@@ -127,6 +128,7 @@ class ExpenseController extends Controller
 
         return Inertia::render('expenses/show', [
             'events' => $events,
+            'verification' => $verifier->verifyExpense($expense),
             'expense' => [
                 'id' => $expense->id,
                 'group_id' => $expense->group_id,

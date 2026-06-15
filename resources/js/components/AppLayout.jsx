@@ -7,8 +7,8 @@ import { Head, Link, usePage } from "@inertiajs/react";
  * Props: title (Head), children.
  */
 export default function AppLayout({ title, children }) {
-    const { auth } = usePage().props;
-    const user = auth?.user;
+    const page = usePage();
+    const user = page.props.auth?.user;
 
     return (
         <div className="relative min-h-screen overflow-hidden bg-[#070b18] text-slate-100">
@@ -22,12 +22,22 @@ export default function AppLayout({ title, children }) {
 
             <div className="relative z-10 mx-auto max-w-6xl px-5 py-8">
                 <header className="flex items-center justify-between animate-rise">
-                    <Link href="/dashboard" className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 font-black shadow-lg shadow-brand-500/40">
-                            S
-                        </div>
-                        <span className="text-lg font-semibold tracking-tight">SafeSplit</span>
-                    </Link>
+                    <div className="flex items-center gap-6">
+                        <Link href="/dashboard" className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 font-black shadow-lg shadow-brand-500/40">
+                                S
+                            </div>
+                            <span className="text-lg font-semibold tracking-tight">SafeSplit</span>
+                        </Link>
+                        <nav className="hidden items-center gap-1 sm:flex">
+                            <NavLink href="/dashboard" active={page.url.startsWith("/dashboard")}>
+                                Dashboard
+                            </NavLink>
+                            <NavLink href="/network" active={page.url.startsWith("/network")}>
+                                Network
+                            </NavLink>
+                        </nav>
+                    </div>
 
                     <div className="flex items-center gap-4">
                         <span className="hidden text-sm text-slate-400 sm:block">{user?.name}</span>
@@ -45,5 +55,18 @@ export default function AppLayout({ title, children }) {
                 <main className="mt-8">{children}</main>
             </div>
         </div>
+    );
+}
+
+function NavLink({ href, active, children }) {
+    return (
+        <Link
+            href={href}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                active ? "bg-white/10 text-white" : "text-slate-400 hover:text-slate-200"
+            }`}
+        >
+            {children}
+        </Link>
     );
 }

@@ -11,7 +11,7 @@ function euro(v) {
 }
 
 export default function ExpenseShow() {
-    const { expense, my_split, events = [] } = usePage().props;
+    const { expense, my_split, events = [], verification } = usePage().props;
 
     const canRespond = my_split && !my_split.is_payer && expense.status === "active";
 
@@ -28,6 +28,8 @@ export default function ExpenseShow() {
             >
                 ← {expense.group_name}
             </Link>
+
+            {verification && <IntegrityBanner verification={verification} />}
 
             <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_320px]">
                 {/* Detail */}
@@ -211,6 +213,74 @@ function AnchorBadge({ status }) {
     };
     const [cls, label] = map[status] ?? map.pending;
     return <span className={`rounded-full px-2 py-0.5 text-xs ${cls}`}>{label}</span>;
+}
+
+function IntegrityBanner({ verification }) {
+    const tampered = verification.overall === "tampered";
+    return (
+        <div
+            className={`mt-4 rounded-2xl border p-5 backdrop-blur-xl animate-rise ${
+                tampered ? "border-rose-500/40 bg-rose-500/10" : "border-emerald-500/30 bg-emerald-500/10"
+            }`}
+        >
+            <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                    <span className="text-2xl">{tampered ? "🚨" : "🛡️"}</span>
+                    <div>
+                        <h2 className={`text-lg font-bold ${tampered ? "text-rose-300" : "text-emerald-300"}`}>
+                            {tampered ? "Tampering detected" : "Integrity verified"}
+                        </h2>
+                        <p className="text-sm text-slate-400">
+                            {tampered
+                                ? "Current data does not match what's anchored on the blockchain."
+                                : "All events match their signatures and the hashes anchored on Hardhat."}
+                        </p>
+                    </div>
+                </div>
+                <button
+                    onClick={() => router.reload()}
+                    className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/10"
+                >
+                    Re-verify
+                </button>
+            </div>
+
+            <div className="mt-4 space-y-2">
+                {verification.events.map((ev) => (
+                    <div key={ev.event_id} className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-mono text-xs font-semibold text-brand-400">{ev.event_type}</span>
+                            <Check label="journal" v={ev.checks.journal} />
+                            <Check label="anchor" v={ev.checks.anchor} />
+                            <Check label="business" v={ev.checks.business} />
+                            <Check label="signature" v={ev.checks.signature} />
+                        </div>
+                        {ev.issues.length > 0 && (
+                            <ul className="mt-2 space-y-1">
+                                {ev.issues.map((m, i) => (
+                                    <li key={i} className="text-xs text-rose-300">
+                                        • {m}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function Check({ label, v }) {
+    // v: true = pass, false = fail, null = not applicable
+    const style =
+        v === true
+            ? "bg-emerald-500/15 text-emerald-300"
+            : v === false
+              ? "bg-rose-500/15 text-rose-300"
+              : "bg-white/5 text-slate-500";
+    const icon = v === true ? "✓" : v === false ? "✗" : "–";
+    return <span className={`rounded-full px-2 py-0.5 text-xs ${style}`}>{icon} {label}</span>;
 }
 
 function ExpenseStatus({ status }) {

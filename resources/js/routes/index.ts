@@ -132,6 +132,50 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 })
 
 /**
+* @see \App\Http\Controllers\NetworkController::network
+* @see app/Http/Controllers/NetworkController.php:12
+* @route '/network'
+*/
+export const network = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: network.url(options),
+    method: 'get',
+})
+
+network.definition = {
+    methods: ["get","head"],
+    url: '/network',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\NetworkController::network
+* @see app/Http/Controllers/NetworkController.php:12
+* @route '/network'
+*/
+network.url = (options?: RouteQueryOptions) => {
+    return network.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\NetworkController::network
+* @see app/Http/Controllers/NetworkController.php:12
+* @route '/network'
+*/
+network.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: network.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\NetworkController::network
+* @see app/Http/Controllers/NetworkController.php:12
+* @route '/network'
+*/
+network.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: network.url(options),
+    method: 'head',
+})
+
+/**
 * @see \App\Http\Controllers\Auth\AuthenticatedSessionController::logout
 * @see app/Http/Controllers/Auth/AuthenticatedSessionController.php:41
 * @route '/logout'

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LedgerEvent;
-use App\Services\AnchorService;
+use App\Services\NodeClient;
 use App\Support\EthSignature;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +16,7 @@ class EventSignatureController extends Controller
      * The server re-derives the message from its own stored event_hash (never trusting
      * client data), recovers the signer address, and checks it matches the user's wallet.
      */
-    public function store(Request $request, LedgerEvent $event, AnchorService $anchor): RedirectResponse
+    public function store(Request $request, LedgerEvent $event, NodeClient $node): RedirectResponse
     {
         // Only the user the event concerns may sign it.
         abort_unless($event->user_id === $request->user()->id, 403);
@@ -52,10 +52,10 @@ class EventSignatureController extends Controller
             'signer_address' => strtolower($recovered),
         ]);
 
-        // Anchor the signed event's hash on-chain (Phase 1: Laravel anchors directly).
-        // Resilient: a chain failure marks the event 'failed' but never breaks signing.
+        // Anchoring now goes through the Go node (BLOC 2.1): it verifies the hash +
+        // signature (BLOC 2.2) and anchors on Hardhat. Resilient: failure → 'failed'.
         try {
-            $txHash = $anchor->anchor($event);
+            $txHash = $node->anchor($event);
             $event->update(['anchor_status' => 'confirmed', 'anchor_tx_hash' => $txHash]);
         } catch (\Throwable $e) {
             $event->update(['anchor_status' => 'failed']);

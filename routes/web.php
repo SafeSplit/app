@@ -7,6 +7,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseSplitController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupMemberController;
+use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\SettlementController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +30,9 @@ Route::middleware('guest')->group(function () {
 // Authenticated app.
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [GroupController::class, 'index'])->name('dashboard');
+
+    // Live blockchain network map.
+    Route::get('/network', [NetworkController::class, 'index'])->name('network');
 
     // Groups & members.
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');

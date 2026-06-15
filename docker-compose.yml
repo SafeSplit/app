@@ -17,6 +17,8 @@ services:
             DB_PORT: 3306
             # Hardhat JSON-RPC reachable from inside the container (host-exposed port).
             SAFESPLIT_RPC_URL: http://host.docker.internal:49545
+            # Go node that anchors signed events (BLOC 2.1+).
+            SAFESPLIT_NODE_URL: http://host.docker.internal:49170
         extra_hosts:
             - "host.docker.internal:host-gateway"
         ports:
